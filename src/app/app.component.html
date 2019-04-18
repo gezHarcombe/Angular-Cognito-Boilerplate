@@ -1,0 +1,8 @@
+<nav>
+  <ul class="main-nav">
+    <li><a [routerLink]="['/']">Secure</a></li>
+    <li *ngIf="!(auth.loggedIn | async)"><a [routerLink]="['/login']">Login</a></li>
+    <li *ngIf="(auth.loggedIn | async)"><a (click)="onClickLogout()">Logout</a></li>
+  </ul>
+</nav>
+<router-outlet></router-outlet>
