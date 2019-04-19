@@ -20,17 +20,14 @@ export class AuthService {
     this.loggedIn = new BehaviorSubject<boolean>(false);
   }
 
-  /** signup */
   public signUp(email, password): Observable<any> {
     return fromPromise(Auth.signUp(email, password));
   }
 
-  /** confirm code */
   public confirmSignUp(email, code): Observable<any> {
     return fromPromise(Auth.confirmSignUp(email, code));
   }
 
-  /** signin */
   public signIn(email, password): Observable<any> {
     return fromPromise(Auth.signIn(email, password))
       .pipe(
@@ -38,7 +35,6 @@ export class AuthService {
       );
   }
 
-  /** get authenticat state */
   public isAuthenticated(): Observable<boolean> {
     return fromPromise(Auth.currentAuthenticatedUser())
       .pipe(
@@ -53,19 +49,30 @@ export class AuthService {
       );
   }
 
-  public getUser(): Observable<any> {
+  // this is the token you need to pass in the 'auth' field of headers to apigateway
+  public getToken(): Observable<string> {
     return fromPromise(Auth.currentAuthenticatedUser())
+      .pipe(
+        map(result => {
+          this.loggedIn.next(true);
+          return result.signInUserSession.idToken.jwtToken;
+        }),
+        catchError(error => {
+          this.loggedIn.next(false);
+          return of('');
+        })
+      )
   }
 
-  /** signout */
   public signOut() {
-    fromPromise(Auth.signOut())
-      .subscribe(
+    Auth.signOut()
+    .then(
         result => {
           this.loggedIn.next(false);
           this.router.navigate(['/login']);
         },
-        error => console.log(error)
-      );
+    ).catch(
+      error => console.log(error)
+    );
   }
 }

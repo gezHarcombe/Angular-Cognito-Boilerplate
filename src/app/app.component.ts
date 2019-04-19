@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { AuthService } from './auth/auth.service';
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html'

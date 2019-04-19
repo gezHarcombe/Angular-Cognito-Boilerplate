@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from './../auth/auth.service';
 import { Observable } from 'rxjs/Observable';
 import { fromPromise } from 'rxjs/observable/fromPromise';
+
+import { HttpClient } from '@angular/common/http';
+import { HttpHeaders, HttpParams } from '@angular/common/http'; 
+
 import { String } from 'aws-sdk/clients/signer';
 
 @Component({
@@ -10,21 +14,28 @@ import { String } from 'aws-sdk/clients/signer';
 })
 export class HomeComponent implements OnInit {
 
-  public token: String;
-  constructor(private auth: AuthService) { }
+  public response: String;
+  constructor(
+    private auth: AuthService,
+    private httpClient: HttpClient
+    ) {
+  }
 
   public logOut(){
     this.auth.signOut();
     console.log('signed out');
   }
 
-  public getUserName() {
-    this.auth.getUser().subscribe( res => {
+  public secureRequest() {
+    this.auth.getToken().subscribe(token => {
+      let httpHeaders = new HttpHeaders()
+        .set('Authorization', token);
 
-      // this is the token you need to pass in the 'auth' field of headers
-      console.log(res.signInUserSession.idToken.jwtToken);
-      this.token = res.signInUserSession.idToken.jwtToken})
-  }
+      let url = 'some_secure_url'
+      this.httpClient.get(url, {headers: httpHeaders})
+        .subscribe(res => {this.response = JSON.stringify(res)});
+  });
+};
 
   ngOnInit() {
   }
